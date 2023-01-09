@@ -1,8 +1,27 @@
 import { Router } from 'express';
 import CartManager from '../cart.js';
+import ProductManager from '../products.js';
 
 const router = Router();
 const cartManager = new CartManager();
+const productManager = new ProductManager()
+
+// Get all carts
+router.get('/', async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const carts = cartManager.carts.slice(0, limit);
+    if (!carts || carts.length === 0) {
+      res.status(404).json({ message: 'No carts found' });
+    } else {
+      res.json(carts);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error getting carts', error });
+  }
+});
+
 
 // Create a new cart
 router.post('/', async (req, res) => {
@@ -20,6 +39,7 @@ router.get('/:cid', async (req, res) => {
   try {
     const cartId = req.params.cid;
     const cart = cartManager.getCartById(cartId);
+    console.log(cart)
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
     } else {

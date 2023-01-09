@@ -1,6 +1,6 @@
 import express from 'express';
 import productRouter from './src/routers/products.router.js';
-import cartsRouter from './src/routers/carts.router.js'
+import cartRouter from './src/routers/carts.router.js'
 
 const app = express();
 
@@ -14,7 +14,7 @@ app.use('/static', express.static('public'));
 app.use('/api/products', productRouter);
 
 // Mount the carts router on the '/api/carts' path
-app.use('/api/carts', cartsRouter);
+app.use('/api/carts', cartRouter);
 
 // Route for root path
 app.get('/', (req, res) => {
