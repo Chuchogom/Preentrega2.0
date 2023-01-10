@@ -10,7 +10,8 @@ const productManager = new ProductManager()
 router.get('/', async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit) : null;
-    const carts = cartManager.carts.slice(0, limit);
+    console.log(cartManager.carts)
+    const carts = limit ? cartManager.carts.slice(0, limit) : cartManager.carts
     if (!carts || carts.length === 0) {
       res.status(404).json({ message: 'No carts found' });
     } else {
@@ -38,12 +39,12 @@ router.post('/', async (req, res) => {
 router.get('/:cid', async (req, res) => {
   try {
     const cartId = req.params.cid;
-    const cart = cartManager.getCartById(cartId);
+    const cart = await cartManager.getCartById(cartId);
     console.log(cart)
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
     } else {
-      res.json(cart.products);
+      res.json(cart)
     }
   } catch (error) {
     console.error(error);
@@ -52,7 +53,7 @@ router.get('/:cid', async (req, res) => {
 });
 
 // Add a product to a cart
-router.post('/:cid/product/:pid', async (req, res) => {
+router.post('/:cid/products/:pid', async (req, res) => {
   try {
     // Get the cart id and product id from the request parameters
     const cartId = req.params.cid;

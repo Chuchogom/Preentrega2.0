@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { promisify } from 'util';
-import Cart from './cart.js'
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -25,7 +24,7 @@ class CartManager {
   addCart = () => {
     try {
       const id = this.cartId();
-      const cart = new Cart(id);
+      const cart = {id,products:[]}
       this.carts.push(cart);
       this.saveCartsToFile();
       return cart;
@@ -38,7 +37,7 @@ class CartManager {
   getCartById = (cartId) => {
     try {
       console.log(`Getting cart with ID: ${cartId}`)
-      const cart = this.carts.find((cart) => cart.id === cartId);
+      const cart = this.carts.find((cart) => cart.id === parseInt(cartId));
       return cart ?? null;
     } catch (error) {
       console.error(error);
@@ -48,7 +47,7 @@ class CartManager {
 
   async loadCartsFromFile() {
     try {
-      const data = await readFile('carts.json');
+      const data = await fs.promises.readFile('carts.json');
       this.carts = JSON.parse(data);
     } catch (error) {
       console.error(error);
@@ -59,22 +58,21 @@ class CartManager {
   async saveCartsToFile() {
     try {
       const data = JSON.stringify(this.carts);
-      await writeFile('carts.json', data);
+      await fs.promises.writeFile('carts.json', data);
     } catch (error) {
       console.error(error);
       throw new Error('Error saving carts to file')
     }
   }
-  addProductToCart(cartId, productId) {
+  async addProductToCart(cartId, productId) {
     try {
       // Find the cart with the specified ID
-      const cart = this.carts.find((cart) => cart.id === cartId);
+      const cart = this.carts.find((cart) => cart.id === parseInt(cartId))
       if (!cart) {
         throw new Error('Cart not found');
       }
 
       // Find the product with the specified ID
-      const product = productManager.getProductById(productId);
       if (!product) {
         throw new Error('Product not found');
       }
@@ -90,6 +88,7 @@ class CartManager {
         // If the product is not in the cart, add it with a quantity of 1
         cart.products.push({ product: productId, quantity: 1 });
       }
+      await this.saveCartsToFile()
     } catch (error) {
       console.error(error);
       throw new Error('Error adding product to cart');
