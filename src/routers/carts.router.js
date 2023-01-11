@@ -44,7 +44,7 @@ router.get('/:cid', async (req, res) => {
     if (!cart) {
       res.status(404).json({ message: 'Cart not found' });
     } else {
-      res.json(cart)
+      res.json(JSON.stringify(cart))
     }
   } catch (error) {
     console.error(error);
